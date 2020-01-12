@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="AirlineModelStoreContainer" CdmEntityContainer="AirlineEntities">
+    <EntitySetMapping Name="Passengers">
+      <EntityTypeMapping TypeName="AirlineModel.Passenger">
+        <MappingFragment StoreEntitySet="Passengers">
+          <ScalarProperty Name="PassengerID" ColumnName="PassengerID" />
+          <ScalarProperty Name="PassengerName" ColumnName="PassengerName" />
+          <ScalarProperty Name="PassengerOnWaitingList" ColumnName="PassengerOnWaitingList" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Seats">
+      <EntityTypeMapping TypeName="AirlineModel.Seat">
+        <MappingFragment StoreEntitySet="Seats">
+          <ScalarProperty Name="SeatID" ColumnName="SeatID" />
+          <ScalarProperty Name="SeatRow" ColumnName="SeatRow" />
+          <ScalarProperty Name="SeatColumn" ColumnName="SeatColumn" />
+          <ScalarProperty Name="IsTaken" ColumnName="IsTaken" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="PassengerSeats" TypeName="AirlineModel.PassengerSeats" StoreEntitySet="PassengerSeats">
+      <EndProperty Name="Passengers">
+        <ScalarProperty Name="PassengerID" ColumnName="PassengerID" />
+      </EndProperty>
+      <EndProperty Name="Seats">
+        <ScalarProperty Name="SeatID" ColumnName="SeatID" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping>

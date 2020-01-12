@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="AirlineModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Passengers">
+          <Key>
+            <PropertyRef Name="PassengerID" />
+          </Key>
+          <Property Name="PassengerID" Type="int" Nullable="false" />
+          <Property Name="PassengerName" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="PassengerOnWaitingList" Type="bit" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'Airline.dbo.PassengerSeats' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="PassengerSeats">
+          <Key>
+            <PropertyRef Name="SeatID" />
+            <PropertyRef Name="PassengerID" />
+          </Key>
+          <Property Name="SeatID" Type="int" Nullable="false" />
+          <Property Name="PassengerID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Seats">
+          <Key>
+            <PropertyRef Name="SeatID" />
+          </Key>
+          <Property Name="SeatID" Type="int" Nullable="false" />
+          <Property Name="SeatRow" Type="smallint" Nullable="false" />
+          <Property Name="SeatColumn" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="IsTaken" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_PassengerSeats_Passengers">
+          <End Role="Passengers" Type="Self.Passengers" Multiplicity="1" />
+          <End Role="PassengerSeats" Type="Self.PassengerSeats" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Passengers">
+              <PropertyRef Name="PassengerID" />
+            </Principal>
+            <Dependent Role="PassengerSeats">
+              <PropertyRef Name="PassengerID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PassengerSeats_Seats">
+          <End Role="Seats" Type="Self.Seats" Multiplicity="1" />
+          <End Role="PassengerSeats" Type="Self.PassengerSeats" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Seats">
+              <PropertyRef Name="SeatID" />
+            </Principal>
+            <Dependent Role="PassengerSeats">
+              <PropertyRef Name="SeatID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="AirlineModelStoreContainer">
+          <EntitySet Name="Passengers" EntityType="Self.Passengers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Seats" EntityType="Self.Seats" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PassengerSeats" EntityType="Self.PassengerSeats" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [PassengerSeats].[SeatID] AS [SeatID], 
+    [PassengerSeats].[PassengerID] AS [PassengerID]
+    FROM [dbo].[PassengerSeats] AS [PassengerSeats]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_PassengerSeats_Passengers" Association="Self.FK_PassengerSeats_Passengers">
+            <End Role="Passengers" EntitySet="Passengers" />
+            <End Role="PassengerSeats" EntitySet="PassengerSeats" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PassengerSeats_Seats" Association="Self.FK_PassengerSeats_Seats">
+            <End Role="Seats" EntitySet="Seats" />
+            <End Role="PassengerSeats" EntitySet="PassengerSeats" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AirlineModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Passenger">
+          <Key>
+            <PropertyRef Name="PassengerID" />
+          </Key>
+          <Property Name="PassengerID" Type="Int32" Nullable="false" />
+          <Property Name="PassengerName" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PassengerOnWaitingList" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Seats" Relationship="Self.PassengerSeats" FromRole="Passengers" ToRole="Seats" />
+        </EntityType>
+        <EntityType Name="Seat">
+          <Key>
+            <PropertyRef Name="SeatID" />
+          </Key>
+          <Property Name="SeatID" Type="Int32" Nullable="false" />
+          <Property Name="SeatRow" Type="Int16" Nullable="false" />
+          <Property Name="SeatColumn" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="IsTaken" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Passengers" Relationship="Self.PassengerSeats" FromRole="Seats" ToRole="Passengers" />
+        </EntityType>
+        <Association Name="PassengerSeats">
+          <End Role="Passengers" Type="Self.Passenger" Multiplicity="*" />
+          <End Role="Seats" Type="Self.Seat" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="AirlineEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Passengers" EntityType="Self.Passenger" />
+          <EntitySet Name="Seats" EntityType="Self.Seat" />
+          <AssociationSet Name="PassengerSeats" Association="Self.PassengerSeats">
+            <End Role="Passengers" EntitySet="Passengers" />
+            <End Role="Seats" EntitySet="Seats" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AirlineModelStoreContainer" CdmEntityContainer="AirlineEntities">
+          <EntitySetMapping Name="Passengers">
+            <EntityTypeMapping TypeName="AirlineModel.Passenger">
+              <MappingFragment StoreEntitySet="Passengers">
+                <ScalarProperty Name="PassengerID" ColumnName="PassengerID" />
+                <ScalarProperty Name="PassengerName" ColumnName="PassengerName" />
+                <ScalarProperty Name="PassengerOnWaitingList" ColumnName="PassengerOnWaitingList" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Seats">
+            <EntityTypeMapping TypeName="AirlineModel.Seat">
+              <MappingFragment StoreEntitySet="Seats">
+                <ScalarProperty Name="SeatID" ColumnName="SeatID" />
+                <ScalarProperty Name="SeatRow" ColumnName="SeatRow" />
+                <ScalarProperty Name="SeatColumn" ColumnName="SeatColumn" />
+                <ScalarProperty Name="IsTaken" ColumnName="IsTaken" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="PassengerSeats" TypeName="AirlineModel.PassengerSeats" StoreEntitySet="PassengerSeats">
+            <EndProperty Name="Passengers">
+              <ScalarProperty Name="PassengerID" ColumnName="PassengerID" />
+            </EndProperty>
+            <EndProperty Name="Seats">
+              <ScalarProperty Name="SeatID" ColumnName="SeatID" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="AirlineModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Passenger">
+    <Key>
+      <PropertyRef Name="PassengerID" />
+    </Key>
+    <Property Name="PassengerID" Type="Int32" Nullable="false" />
+    <Property Name="PassengerName" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="PassengerOnWaitingList" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="Seats" Relationship="Self.PassengerSeats" FromRole="Passengers" ToRole="Seats" />
+  </EntityType>
+  <EntityType Name="Seat">
+    <Key>
+      <PropertyRef Name="SeatID" />
+    </Key>
+    <Property Name="SeatID" Type="Int32" Nullable="false" />
+    <Property Name="SeatRow" Type="Int16" Nullable="false" />
+    <Property Name="SeatColumn" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+    <Property Name="IsTaken" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="Passengers" Relationship="Self.PassengerSeats" FromRole="Seats" ToRole="Passengers" />
+  </EntityType>
+  <Association Name="PassengerSeats">
+    <End Role="Passengers" Type="Self.Passenger" Multiplicity="*" />
+    <End Role="Seats" Type="Self.Seat" Multiplicity="*" />
+  </Association>
+  <EntityContainer Name="AirlineEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Passengers" EntityType="Self.Passenger" />
+    <EntitySet Name="Seats" EntityType="Self.Seat" />
+    <AssociationSet Name="PassengerSeats" Association="Self.PassengerSeats">
+      <End Role="Passengers" EntitySet="Passengers" />
+      <End Role="Seats" EntitySet="Seats" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

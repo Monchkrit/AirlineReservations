@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="AirlineModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Passengers">
+    <Key>
+      <PropertyRef Name="PassengerID" />
+    </Key>
+    <Property Name="PassengerID" Type="int" Nullable="false" />
+    <Property Name="PassengerName" Type="nvarchar" MaxLength="64" Nullable="false" />
+    <Property Name="PassengerOnWaitingList" Type="bit" Nullable="false" />
+  </EntityType>
+  <!--Errors Found During Generation:
+warning 6002: The table/view 'Airline.dbo.PassengerSeats' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+  <EntityType Name="PassengerSeats">
+    <Key>
+      <PropertyRef Name="SeatID" />
+      <PropertyRef Name="PassengerID" />
+    </Key>
+    <Property Name="SeatID" Type="int" Nullable="false" />
+    <Property Name="PassengerID" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Seats">
+    <Key>
+      <PropertyRef Name="SeatID" />
+    </Key>
+    <Property Name="SeatID" Type="int" Nullable="false" />
+    <Property Name="SeatRow" Type="smallint" Nullable="false" />
+    <Property Name="SeatColumn" Type="char" MaxLength="10" Nullable="false" />
+    <Property Name="IsTaken" Type="bit" Nullable="false" />
+  </EntityType>
+  <Association Name="FK_PassengerSeats_Passengers">
+    <End Role="Passengers" Type="Self.Passengers" Multiplicity="1" />
+    <End Role="PassengerSeats" Type="Self.PassengerSeats" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Passengers">
+        <PropertyRef Name="PassengerID" />
+      </Principal>
+      <Dependent Role="PassengerSeats">
+        <PropertyRef Name="PassengerID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PassengerSeats_Seats">
+    <End Role="Seats" Type="Self.Seats" Multiplicity="1" />
+    <End Role="PassengerSeats" Type="Self.PassengerSeats" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Seats">
+        <PropertyRef Name="SeatID" />
+      </Principal>
+      <Dependent Role="PassengerSeats">
+        <PropertyRef Name="SeatID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="AirlineModelStoreContainer">
+    <EntitySet Name="Passengers" EntityType="Self.Passengers" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Seats" EntityType="Self.Seats" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="PassengerSeats" EntityType="Self.PassengerSeats" store:Type="Tables" store:Schema="dbo">
+      <DefiningQuery>SELECT 
+    [PassengerSeats].[SeatID] AS [SeatID], 
+    [PassengerSeats].[PassengerID] AS [PassengerID]
+    FROM [dbo].[PassengerSeats] AS [PassengerSeats]</DefiningQuery>
+    </EntitySet>
+    <AssociationSet Name="FK_PassengerSeats_Passengers" Association="Self.FK_PassengerSeats_Passengers">
+      <End Role="Passengers" EntitySet="Passengers" />
+      <End Role="PassengerSeats" EntitySet="PassengerSeats" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PassengerSeats_Seats" Association="Self.FK_PassengerSeats_Seats">
+      <End Role="Seats" EntitySet="Seats" />
+      <End Role="PassengerSeats" EntitySet="PassengerSeats" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
